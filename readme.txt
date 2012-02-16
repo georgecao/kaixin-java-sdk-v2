@@ -2,11 +2,9 @@
 
 
 1、请把您的APP Key、secret以及回调地址添加到src/kx4j/KxSDK.java中：
-	public static String CONSUMER_KEY =  "";//api key
-    	public static String CONSUMER_SECRET = "";//secret key
-	public static String Redirect_uri = ".../callback.jsp";//需与注册信息中网站地址的域名一致，可修改域名映射在本地进行测试
-
-
+    public static String consumerKey = "";//api key
+    public static String consumerSecret = "";//secret key
+    public static String redirectUri = "";//需与注册信息中网站地址的域名一致，可修改域名映射在本地进行测试
 
 2、运行test/web/call.jsp文件就可以体验oauth2.0授权流程了。使用oauth授权，组件类型必须是“连接开心网”，若是“站内组件”会返回40011错误。其中：
   c. Resource Owner Password Credentials：采用用户名、密码获取Access Token，适用于任何类型应用。

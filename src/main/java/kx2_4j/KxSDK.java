@@ -44,9 +44,9 @@ import java.util.logging.Logger;
  * A java reporesentation of the <a href="http://wiki.open.kaixin001.com/">KxSDK API</a>
  */
 public class KxSDK {
-    public static String CONSUMER_KEY = "";//api key
-    public static String CONSUMER_SECRET = "";//secret key
-    public static String Redirect_uri = ".../callback.jsp";//需与注册信息中网站地址的域名一致，可修改域名映射在本地进行测试
+    public static String consumerKey = "";//api key
+    public static String consumerSecret = "";//secret key
+    public static String redirectUri = "";//需与注册信息中网站地址的域名一致，可修改域名映射在本地进行测试
     public static String baseURL = "https://api.kaixin001.com/";
     public static String authorizationURL = "http://api.kaixin001.com/oauth2/authorize";
     public static String accessTokenURL = "http://api.kaixin001.com/oauth2/access_token";
@@ -67,8 +67,8 @@ public class KxSDK {
     protected String getAuthorizeURL(String type, String scope, String state, String display) {
         PostParameter[] params = new PostParameter[6];
         params[0] = new PostParameter("response_type", type);
-        params[1] = new PostParameter("client_id", CONSUMER_KEY);
-        params[2] = new PostParameter("redirect_uri", Redirect_uri);
+        params[1] = new PostParameter("client_id", consumerKey);
+        params[2] = new PostParameter("redirect_uri", redirectUri);
         params[3] = new PostParameter("scope", scope);
         params[4] = new PostParameter("state", state);
         params[5] = new PostParameter("display", display);
@@ -81,10 +81,10 @@ public class KxSDK {
         try {
             PostParameter[] params = new PostParameter[5];
             params[0] = new PostParameter("grant_type", "authorization_code");
-            params[1] = new PostParameter("client_id", CONSUMER_KEY);
-            params[2] = new PostParameter("client_secret", CONSUMER_SECRET);
+            params[1] = new PostParameter("client_id", consumerKey);
+            params[2] = new PostParameter("client_secret", consumerSecret);
             params[3] = new PostParameter("code", code);
-            params[4] = new PostParameter("redirect_uri", Redirect_uri);
+            params[4] = new PostParameter("redirect_uri", redirectUri);
 
             oauthToken = new AccessToken(http.get(accessTokenURL, params));
         } catch (KxException te) {
@@ -98,8 +98,8 @@ public class KxSDK {
         try {
             PostParameter[] params = new PostParameter[6];
             params[0] = new PostParameter("grant_type", "password");
-            params[1] = new PostParameter("client_id", CONSUMER_KEY);
-            params[2] = new PostParameter("client_secret", CONSUMER_SECRET);
+            params[1] = new PostParameter("client_id", consumerKey);
+            params[2] = new PostParameter("client_secret", consumerSecret);
             params[3] = new PostParameter("username", username);
             params[4] = new PostParameter("password", password);
             params[5] = new PostParameter("scope", scope);
@@ -115,8 +115,8 @@ public class KxSDK {
         try {
             PostParameter[] params = new PostParameter[5];
             params[0] = new PostParameter("grant_type", "refresh_token");
-            params[1] = new PostParameter("client_id", CONSUMER_KEY);
-            params[2] = new PostParameter("client_secret", CONSUMER_SECRET);
+            params[1] = new PostParameter("client_id", consumerKey);
+            params[2] = new PostParameter("client_secret", consumerSecret);
             params[3] = new PostParameter("refresh_token", refresh_token);
             params[4] = new PostParameter("scope", scope);
             oauthToken = new AccessToken(http.get(accessTokenURL, params));

@@ -6,9 +6,12 @@
 
     <groupId>com.kaixin001</groupId>
     <artifactId>kaixin-sdk</artifactId>
-    <version>1.0.0</version>
+    <version>2.0</version>
     <packaging>jar</packaging>
-    <name>kaixin-sdk</name>
+    <name>kaixin-java-sdk</name>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>commons-codec</groupId>

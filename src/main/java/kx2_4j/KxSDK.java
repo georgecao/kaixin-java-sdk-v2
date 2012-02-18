@@ -35,6 +35,7 @@ import kx2_4j.org.json.JSONException;
 import kx2_4j.org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,6 +45,7 @@ import java.util.logging.Logger;
  * A java reporesentation of the <a href="http://wiki.open.kaixin001.com/">KxSDK API</a>
  */
 public class KxSDK {
+    private static final Logger log = Logger.getLogger(KxSDK.class.getName());
     public static String consumerKey = "";//api key
     public static String consumerSecret = "";//secret key
     public static String redirectUri = "";//需与注册信息中网站地址的域名一致，可修改域名映射在本地进行测试
@@ -199,7 +201,6 @@ public class KxSDK {
         if (null == fields) fields = "";
         if (start < 0) start = 0;
         if (num < 0 || num > 50) num = 20;
-        ;
         params[1] = new PostParameter("fields", fields);
         params[2] = new PostParameter("start", start);
         params[3] = new PostParameter("num", num);
@@ -236,7 +237,7 @@ public class KxSDK {
         params[0] = new PostParameter("access_token", this.accessToken.getToken());
         if (start < 0) start = 0;
         if (num < 0 || num > 50) num = 20;
-        ;
+
         params[1] = new PostParameter("uids", uids);
         params[2] = new PostParameter("start", start);
         params[3] = new PostParameter("num", num);
@@ -249,7 +250,6 @@ public class KxSDK {
         params[0] = new PostParameter("access_token", this.accessToken.getToken());
         if (start < 0) start = 0;
         if (num < 0 || num > 50) num = 20;
-        ;
         params[1] = new PostParameter("start", start);
         params[2] = new PostParameter("num", num);
         return new UIDs(get("app/friends", params), this);
@@ -264,7 +264,6 @@ public class KxSDK {
         params[0] = new PostParameter("access_token", this.accessToken.getToken());
         if (start < 0) start = 0;
         if (num < 0 || num > 50) num = 20;
-        ;
         params[1] = new PostParameter("uid", uid);
         params[2] = new PostParameter("start", start);
         params[3] = new PostParameter("num", num);
@@ -272,56 +271,102 @@ public class KxSDK {
         return new InvitedUIDs(get("app/invited", params), this);
     }
 
-    public long postRecord(String content, Integer save_to_album, String location, String lat, String lon, Integer sync_status, Integer spri, String pic, String picurl) throws KxException {
+    /**
+     * 向指定的好友发送系统消息，注意：只能给当前用户的好友发送系统消息
+     *
+     * @param fuids    Required.
+     *                 系统消息接收用户的uid,多个用户用半角逗号隔开，最多30个
+     * @param linkText Required.
+     *                 动态里面的链接文字，不超过15个汉字。例如，链接文案：去xx帮忙。
+     * @param link     Required.
+     *                 动态里的链接地址。必须以http或https开头。
+     * @param text     Required.
+     *                 发送动态所使用的文案，不超过60个汉字，否则会被截断。 该文案可以有{_USER_} {_USER_TA_}变量，解析时会被替换为当前用户名字和他/她。 例如，动态文案：{_USER_} 在做XX任务时遇到了强大的XX，快去帮帮{_USER_TA_}！
+     * @param word     Optional.
+     *                 动态里用户的附言
+     * @param picUrl   Optional.
+     *                 发送动态所使用的图片地址，如果动态分享中需要发布图片，则此项必填。 单张图片时，大小为80×80。
+     * @return an instance of {@link Response}
+     * @throws KxException
+     */
+    public Response sendSysnews(String fuids, String linkText, String link, String text, String word, String picUrl) throws KxException {
+        List<PostParameter> params = new ArrayList<PostParameter>(7);
+        params.add(new PostParameter("fuids", fuids));
+        params.add(new PostParameter("linktext", linkText));
+        params.add(new PostParameter("link", link));
+        params.add(new PostParameter("text", text));
+        if (null != word && word.trim().length() != 0) {
+            params.add(new PostParameter("word", word));
+        }
+        if (null != picUrl && picUrl.trim().length() != 0) {
+            params.add(new PostParameter("picurl", picUrl));
+        }
+        params.add(new PostParameter("access_token", this.accessToken.getToken()));
+        return post("/sysnews/send", params);
+    }
+
+    /**
+     * 发布一条记录(可以带一张图片)
+     *
+     * @param content     Required.
+     *                    发记录的内容(最多140个汉字或280个英文字母字符)
+     * @param saveToAlbum Optional.
+     *                    是否存到记录相册中，0/1-不保存/保存，默认为0不保存
+     * @param location    Optional.
+     *                    记录的地理位置(目前仅在“我的记录”列表中显示)
+     * @param lat         Optional.
+     *                    纬度 -90.0到+90.0，+表示北纬(目前暂不能显示)
+     * @param lon         Optional.
+     *                    经度 -180.0到+180.0，+表示东经(目前暂不能显示)
+     * @param syncStatus  Optional.
+     *                    是否同步签名 0/1/2-无任何操作/同步/不同步，默认为0无任何操作
+     * @param privacy     Optional.
+     *                    权限设置，0/1/2/3-任何人可见/好友可见/仅自己可见/好友及好友的好友可见 默认为0任何人可见
+     * @param pic         Optional.
+     *                    发记录上传的图片，图片在10M以内，格式支持jpg/jpeg/gif/png/bmp *pic和picurl只能选择其一，两个同时提交时，只取pic * oauth1.0，pic参数不需要参加签名
+     * @param picUrl      Optional.
+     *                    外部图片链接，图片在10M以内，格式支持jpg/jpeg/gif/png/bmp *pic和picurl只能选择其一，两个同时提交时，只取pic
+     * @return an instance of {@link Response}
+     * @throws KxException
+     */
+    public long postRecord(String content, Integer saveToAlbum, String location, String lat, String lon, Integer syncStatus, Integer privacy, String pic, String picUrl) throws KxException {
         if (content == null || content.length() <= 0) {
             throw new KxException("records content can't be null!");
         }
-        if (save_to_album == null) save_to_album = 0;
+        if (saveToAlbum == null) saveToAlbum = 0;
         if (location == null) location = "";
-        if (sync_status == null) sync_status = 0;
+        if (syncStatus == null) syncStatus = 0;
         if (lat == null) lat = "";
         if (lon == null) lon = "";
-        if (spri == null) spri = 0;
-
+        if (privacy == null) privacy = 0;
+        List<PostParameter> postParameters = new ArrayList<PostParameter>(9);
+        postParameters.add(new PostParameter("access_token", this.accessToken.getToken()));
+        postParameters.add(new PostParameter("content", content));
+        postParameters.add(new PostParameter("save_to_album", saveToAlbum));
+        postParameters.add(new PostParameter("location", location));
+        postParameters.add(new PostParameter("sync_status", syncStatus));
+        postParameters.add(new PostParameter("spri", privacy));
+        postParameters.add(new PostParameter("lat", lat));
+        postParameters.add(new PostParameter("lon", lon));
         Response res = null;
         if (pic != null && pic.length() > 0) {
-            PostParameter[] params = new PostParameter[8];
-            params[0] = new PostParameter("access_token", this.accessToken.getToken());
-            params[1] = new PostParameter("content", content);
-            params[2] = new PostParameter("save_to_album", save_to_album);
-            params[3] = new PostParameter("location", location);
-            params[4] = new PostParameter("sync_status", sync_status);
-            params[5] = new PostParameter("spri", spri);
-            params[6] = new PostParameter("lat", lat);
-            params[7] = new PostParameter("lon", lon);
             File picFile = new File(pic);
             if (!picFile.exists()) {
                 System.out.println("文件\"" + pic + "\"不存在");
                 return 0;
             }
-            res = http.multPartURL("pic", baseURL + "records/add" + "." + format, params, picFile);
+            res = http.multPartURL("pic", baseURL + "records/add" + "." + format, postParameters.toArray(new PostParameter[postParameters.size()]), picFile);
         } else {
-            PostParameter[] params = new PostParameter[9];
-            params[0] = new PostParameter("content", content);
-            params[1] = new PostParameter("save_to_album", save_to_album);
-            params[2] = new PostParameter("location", location);
-            params[3] = new PostParameter("sync_status", sync_status);
-            params[4] = new PostParameter("spri", spri);
-            params[5] = new PostParameter("lat", lat);
-            params[6] = new PostParameter("lon", lon);
-            params[7] = new PostParameter("picurl", picurl);
-            params[8] = new PostParameter("access_token", this.accessToken.getToken());
-            res = post("records/add", params);
+            postParameters.add(new PostParameter("picurl", picUrl));
+            res = post("records/add", postParameters);
         }
-
         JSONObject json = res.asJSONObject();
         long rid = 0;
         try {
             rid = json.getLong(("rid"));
         } catch (JSONException ex) {
-            Logger.getLogger(KxSDK.class.getName()).log(Level.SEVERE, null, ex);
+            log.log(Level.SEVERE, null, ex);
         }
-
         return rid;
     }
 
@@ -342,7 +387,7 @@ public class KxSDK {
         try {
             albumid = json.getLong(("albumid"));
         } catch (JSONException ex) {
-            Logger.getLogger(KxSDK.class.getName()).log(Level.SEVERE, null, ex);
+            log.log(Level.SEVERE, null, ex);
         }
         return albumid;
     }
@@ -394,5 +439,13 @@ public class KxSDK {
     protected Response post(String api, PostParameter[] params) throws KxException {
         api = baseURL + api + "." + format;
         return http.post(api, params);
+    }
+
+    protected Response get(String api, List<PostParameter> params) throws KxException {
+        return get(api, params.toArray(new PostParameter[params.size()]));
+    }
+
+    protected Response post(String api, List<PostParameter> params) throws KxException {
+        return post(api, params.toArray(new PostParameter[params.size()]));
     }
 }

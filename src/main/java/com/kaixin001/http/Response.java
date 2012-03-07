@@ -24,12 +24,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package kx2_4j.http;
+package com.kaixin001.http;
 
-import kx2_4j.KxException;
-import kx2_4j.org.json.JSONArray;
-import kx2_4j.org.json.JSONException;
-import kx2_4j.org.json.JSONObject;
+import com.kaixin001.KaixinException;
+import com.kaixin001.org.json.JSONArray;
+import com.kaixin001.org.json.JSONException;
+import com.kaixin001.org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -109,7 +109,7 @@ public class Response {
      *
      * Disconnects the internal HttpURLConnection silently.
      * @return response body stream
-     * @throws KxException
+     * @throws com.kaixin001.KaixinException
      * @see #disconnect()
      */
     public InputStream asStream() {
@@ -123,9 +123,9 @@ public class Response {
      * Returns the response body as string.<br>
      * Disconnects the internal HttpURLConnection silently.
      * @return response body
-     * @throws KxException
+     * @throws com.kaixin001.KaixinException
      */
-    public String asString() throws KxException{
+    public String asString() throws KaixinException {
         if(null == responseAsString){
             BufferedReader br;
             try {
@@ -146,9 +146,9 @@ public class Response {
                 streamConsumed = true;
             } catch (NullPointerException npe) {
                 // don't remember in which case npe can be thrown
-                throw new KxException(npe.getMessage(), npe);
+                throw new KaixinException(npe.getMessage(), npe);
             } catch (IOException ioe) {
-                throw new KxException(ioe.getMessage(), ioe);
+                throw new KaixinException(ioe.getMessage(), ioe);
             }
         }
         return responseAsString;
@@ -158,18 +158,18 @@ public class Response {
      * Returns the response body as org.w3c.dom.Document.<br>
      * Disconnects the internal HttpURLConnection silently.
      * @return response body as org.w3c.dom.Document
-     * @throws KxException
+     * @throws com.kaixin001.KaixinException
      */
-    public Document asDocument() throws KxException {
+    public Document asDocument() throws KaixinException {
         if (null == responseAsDocument) {
             try {
                 // it should be faster to read the inputstream directly.
                 // but makes it difficult to troubleshoot
                 this.responseAsDocument = builders.get().parse(new ByteArrayInputStream(asString().getBytes("UTF-8")));
             } catch (SAXException saxe) {
-                throw new KxException("The response body was not well-formed:\n" + responseAsString, saxe);
+                throw new KaixinException("The response body was not well-formed:\n" + responseAsString, saxe);
             } catch (IOException ioe) {
-                throw new KxException("There's something with the connection.", ioe);
+                throw new KaixinException("There's something with the connection.", ioe);
             }
         }
         return responseAsDocument;
@@ -179,13 +179,13 @@ public class Response {
      * Returns the response body as sinat4j.org.json.JSONObject.<br>
      * Disconnects the internal HttpURLConnection silently.
      * @return response body as sinat4j.org.json.JSONObject
-     * @throws KxException
+     * @throws com.kaixin001.KaixinException
      */
-    public JSONObject asJSONObject() throws KxException {
+    public JSONObject asJSONObject() throws KaixinException {
         try {
             return new JSONObject(asString());
         } catch (JSONException jsone) {
-            throw new KxException(jsone.getMessage() + ":" + this.responseAsString, jsone);
+            throw new KaixinException(jsone.getMessage() + ":" + this.responseAsString, jsone);
         }
     }
 
@@ -193,13 +193,13 @@ public class Response {
      * Returns the response body as sinat4j.org.json.JSONArray.<br>
      * Disconnects the internal HttpURLConnection silently.
      * @return response body as sinat4j.org.json.JSONArray
-     * @throws KxException
+     * @throws com.kaixin001.KaixinException
      */
-    public JSONArray asJSONArray() throws KxException {
+    public JSONArray asJSONArray() throws KaixinException {
         try {
         	return  new JSONArray(asString());  
         } catch (Exception jsone) {
-            throw new KxException(jsone.getMessage() + ":" + this.responseAsString, jsone);
+            throw new KaixinException(jsone.getMessage() + ":" + this.responseAsString, jsone);
         }
     }
 

@@ -1,4 +1,4 @@
-package kx2_4j.org.json;
+package com.kaixin001.org.json;
 
 /**
  * The JSONException is thrown by the JSON.org classes then things are amiss.

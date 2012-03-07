@@ -24,82 +24,72 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package kx2_4j;
+package com.kaixin001;
 
-import kx2_4j.http.Response;
-import kx2_4j.org.json.JSONArray;
-import kx2_4j.org.json.JSONException;
-import kx2_4j.org.json.JSONObject;
+import com.kaixin001.http.Response;
+import com.kaixin001.org.json.JSONArray;
+import com.kaixin001.org.json.JSONException;
+import com.kaixin001.org.json.JSONObject;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import java.util.Arrays;
 
 /**
- * A data class representing array of numeric UIDs.
+ * A data class representing array of numeric IDs.
  *
  * @author Yusuke Yamamoto - yusuke at mac.com
  * @editor polaris
  */
-public class UIDs extends KxResponse {
-    private long[] uids;
+public class InvitedUIDs extends KaixinResponse {
+    private AppStatus[] statuses;
     private long prev;
     private long next;
     private static final long serialVersionUID = -6585026560164704953L;
-    private static String[] ROOT_NODE_NAMES = {"id_list", "ids"};
+    private static String[] ROOT_NODE_NAMES = {"statuses_list", "statuses"};
 
-    /*package*/ UIDs(Response res) throws KxException {
+    /*package*/ InvitedUIDs(Response res) throws KaixinException {
         super(res);
         Element elem = res.asDocument().getDocumentElement();
-        ensureRootNodeNameIs(ROOT_NODE_NAMES, elem);
-        NodeList idlist = elem.getElementsByTagName("id");
-        uids = new long[idlist.getLength()];
-        for (int i = 0; i < idlist.getLength(); i++) {
-            try {
-                uids[i] = Long.parseLong(idlist.item(i).getFirstChild().getNodeValue());
-            } catch (NumberFormatException nfe) {
-                throw new KxException("KaiXin API returned malformed response: " + elem, nfe);
-            }
-        }
+        
         prev = getChildLong("prev", elem);
         next = getChildLong("next", elem);
     }
 
-    /*package*/ UIDs(Response res,KxSDK w) throws KxException {
+    /*package*/ InvitedUIDs(Response res,Kaixin w) throws KaixinException {
         super(res);
         if("[]\n".equals(res.asString())){
         	prev=0;
         	next=0;
-        	uids= new long[0];
+        	statuses= new AppStatus[0];
         	return;
         }
         JSONObject json=  res.asJSONObject();
         try {
-        	prev = json.getLong("prev");
+            prev = json.getLong("prev");
             next = json.getLong("next");
-        	
-            if(!json.isNull("uids")){
-        		JSONArray jsona= json.getJSONArray("uids");
-        		int size=jsona.length();
-        		uids =new long[ size];
-        		for (int i = 0; i < size; i++) {
-        			uids[i] =jsona.getLong(i);
-				}
-        	}
+        
+            if(!json.isNull("statuses")){
+                    JSONArray jsona = json.getJSONArray("statuses");
+                    int size = jsona.length();
+                    statuses = new AppStatus[ size];
+                    for (int i = 0; i < size; i++) {
+                        statuses[i] = new AppStatus(jsona.getJSONObject(i));
+                    }
+            }
         	
          } catch (JSONException jsone) {
-             throw new KxException(jsone);
+             throw new KaixinException(jsone);
          } 
         
     }
 
-    public long[] getIDs() {
-        return uids;
+    public AppStatus[] getAppStatuses() {
+        return statuses;
     }
 
     /**
      *
-     * @since Kx4J 1.0
+     * @since Kx4J 1.2.0
      */
     public boolean hasPrevious(){
         return 0 != prev;
@@ -107,7 +97,7 @@ public class UIDs extends KxResponse {
 
     /**
      *
-     * @since Kx4j 1.0
+     * @since Kx4J 1.2.0
      */
     public long getPreviousCursor() {
         return prev;
@@ -115,15 +105,15 @@ public class UIDs extends KxResponse {
 
     /**
      *
-     * @since Kx4j 1.0
+     * @since Kx4J 1.2.0
      */
     public boolean hasNext(){
-        return 0 != next;
+        return next >= 0;
     }
 
     /**
      *
-     * @since Kx4j 1.0
+     * @since Kx4J 1.2.0
      */
     public long getNextCursor() {
         return next;
@@ -132,18 +122,18 @@ public class UIDs extends KxResponse {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UIDs)) return false;
+        if (!(o instanceof InvitedUIDs)) return false;
 
-        UIDs iDs = (UIDs) o;
+        InvitedUIDs iDs = (InvitedUIDs) o;
 
-        if (!Arrays.equals(uids, iDs.uids)) return false;
+        if (!Arrays.equals(statuses, iDs.statuses)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return uids != null ? Arrays.hashCode(uids) : 0;
+        return statuses != null ? Arrays.hashCode(statuses) : 0;
     }
 
     @Override
@@ -151,17 +141,17 @@ public class UIDs extends KxResponse {
         
         StringBuilder sb = new StringBuilder("");
         
-        int len = uids.length;
+        int len = statuses.length;
         
         for(int i = 0; i < len; i++) {
-            sb.append(uids[i]);
+            sb.append(statuses[i].toString());
             
             if(i < len - 1) {
                 sb.append(",");
             }
         }
-        return "IDs{" +
-                "uids=[" + sb.toString() +
+        return "InvitedUIDs{" +
+                "statuses=[" + sb.toString() +
                 "], prev=" + prev +
                 ", next=" + next +
                 '}';

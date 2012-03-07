@@ -24,12 +24,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package kx2_4j;
+package com.kaixin001;
 
-import kx2_4j.http.Response;
-import kx2_4j.org.json.JSONArray;
-import kx2_4j.org.json.JSONException;
-import kx2_4j.org.json.JSONObject;
+import com.kaixin001.http.Response;
+import com.kaixin001.org.json.JSONArray;
+import com.kaixin001.org.json.JSONException;
+import com.kaixin001.org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -45,50 +45,50 @@ import java.util.List;
  * @since Kx4J 1.0
  */
 @Deprecated
-public class RetweetDetails extends KxResponse implements
+public class RetweetDetails extends KaixinResponse implements
         java.io.Serializable {
     private long retweetId;
     private Date retweetedAt;
     private User retweetingUser;
     static final long serialVersionUID = 1957982268696560598L;
     
-    /*package*/RetweetDetails(Response res, KxSDK kxSDK) throws KxException {
+    /*package*/RetweetDetails(Response res, Kaixin kaixin) throws KaixinException {
         super(res);
         Element elem = res.asDocument().getDocumentElement();
-        init(res, elem, kxSDK);
+        init(res, elem, kaixin);
     }
     
-    RetweetDetails(JSONObject json) throws KxException {
+    RetweetDetails(JSONObject json) throws KaixinException {
         super();
         init(json);
     }
     
     
 
-    private void init(JSONObject json) throws KxException{
+    private void init(JSONObject json) throws KaixinException {
     	try {
     		retweetId = json.getInt("retweetId");
     		retweetedAt = parseDate(json.getString("retweetedAt"), "EEE MMM dd HH:mm:ss z yyyy");
     		retweetingUser=new User(json.getJSONObject("retweetingUser"));
             
         } catch (JSONException jsone) {
-            throw new KxException(jsone.getMessage() + ":" + json.toString(), jsone);
+            throw new KaixinException(jsone.getMessage() + ":" + json.toString(), jsone);
         }
 	}
 
-	/*package*/RetweetDetails(Response res, Element elem, KxSDK kxSDK) throws
-            KxException {
+	/*package*/RetweetDetails(Response res, Element elem, Kaixin kaixin) throws
+            KaixinException {
         super(res);
-        init(res, elem, kxSDK);
+        init(res, elem, kaixin);
     }
 
-    private void init(Response res, Element elem, KxSDK kxSDK) throws
-            KxException {
+    private void init(Response res, Element elem, Kaixin kaixin) throws
+            KaixinException {
         ensureRootNodeNameIs("retweet_details", elem);
         retweetId = getChildLong("retweet_id", elem);
         retweetedAt = getChildDate("retweeted_at", elem);
         retweetingUser = new User(res, (Element) elem.getElementsByTagName("retweeting_user").item(0)
-                , kxSDK);
+                , kaixin);
     }
 
     public long getRetweetId() {
@@ -104,7 +104,7 @@ public class RetweetDetails extends KxResponse implements
     }
     /*modify by sycheng add json*/
     /*package*/
-    static List<RetweetDetails> createRetweetDetails(Response res) throws KxException {
+    static List<RetweetDetails> createRetweetDetails(Response res) throws KaixinException {
     	try {
             JSONArray list = res.asJSONArray();
             int size = list.length();
@@ -114,15 +114,15 @@ public class RetweetDetails extends KxResponse implements
             }
             return retweets;
         } catch (JSONException jsone) {
-            throw new KxException(jsone);
-        } catch (KxException te) {
+            throw new KaixinException(jsone);
+        } catch (KaixinException te) {
             throw te;
         }  
     }
     
     /*package*/
     static List<RetweetDetails> createRetweetDetails(Response res,
-                                          KxSDK kxSDK) throws KxException {
+                                          Kaixin kaixin) throws KaixinException {
         Document doc = res.asDocument();
         if (isRootNodeNilClasses(doc)) {
             return new ArrayList<RetweetDetails>(0);
@@ -135,10 +135,10 @@ public class RetweetDetails extends KxResponse implements
                 List<RetweetDetails> statuses = new ArrayList<RetweetDetails>(size);
                 for (int i = 0; i < size; i++) {
                     Element status = (Element) list.item(i);
-                    statuses.add(new RetweetDetails(res, status, kxSDK));
+                    statuses.add(new RetweetDetails(res, status, kaixin));
                 }
                 return statuses;
-            } catch (KxException te) {
+            } catch (KaixinException te) {
                 ensureRootNodeNameIs("nil-classes", doc);
                 return new ArrayList<RetweetDetails>(0);
             }

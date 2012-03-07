@@ -1,10 +1,10 @@
-<%@page import="kx2_4j.AppStatus" %>
+<%@page import="com.kaixin001.AppStatus" %>
 <%@ page contentType="text/html;charset=utf-8" %>
-<%@ page language="java" import="kx2_4j.InvitedUIDs" %>
-<%@ page language="java" import="kx2_4j.UIDs" %>
-<%@ page import="kx2_4j.User" %>
-<%@ page import="kx2_4j.http.AccessToken" %>
-<%@ page import="kx2_4j.http.Response" %>
+<%@ page language="java" import="com.kaixin001.InvitedUIDs" %>
+<%@ page language="java" import="com.kaixin001.UIDs" %>
+<%@ page import="com.kaixin001.User" %>
+<%@ page import="com.kaixin001.http.AccessToken" %>
+<%@ page import="com.kaixin001.http.Response" %>
 <%@ page import="java.util.List" %>
 
 <script type="text/javascript">
@@ -16,7 +16,7 @@
     }
 </script>
 
-<jsp:useBean id="connection" scope="session" class="kx2_4j.KxSDK"/>
+<jsp:useBean id="connection" scope="session" class="com.kaixin001.Kaixin"/>
 <%
     String code = request.getParameter("code");
     String access_token = request.getParameter("access_token");

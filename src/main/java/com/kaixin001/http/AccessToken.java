@@ -24,66 +24,67 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package kx2_4j.http;
+package com.kaixin001.http;
 
-import kx2_4j.KxException;
+import com.kaixin001.KaixinException;
 
 import java.io.Serializable;
 
 /**
  * Representing authorized Access Token which is passed to the service provider in order to access protected resources.<br>
  * the token and token secret can be stored into some persistent stores such as file system or RDBMS for the further accesses.
+ *
  * @author Yusuke Yamamoto - yusuke at mac.com
  */
 public class AccessToken implements Serializable {
     private static final long serialVersionUID = -8344528374458826291L;
-	private String access_token;
-    private long expires_in;
-    private String refresh_token;
+    private String accessToken;
+    private long expiresIn;
+    private String refreshToken;
     private String scope;
     private String state;
 
 
     String[] responseStr = null;
 
-    public AccessToken(Response res) throws KxException {
+    public AccessToken(Response res) throws KaixinException {
         this(res.asString());
     }
 
     // for test unit
     AccessToken(String str) {
-    	responseStr = str.split(",");
-        access_token = getParameter("{\"access_token\"");
-    	String sexpires_in = getParameter("\"expires_in\"");
-    	expires_in = Long.parseLong(sexpires_in);
-        refresh_token = getParameter("\"refresh_token\"");
-    	scope = getParameter("\"scope\"");
-    	state = getParameter("\"state\"");
+        responseStr = str.split(",");
+        accessToken = getParameter("{\"access_token\"");
+        String in = getParameter("\"expires_in\"");
+        expiresIn = Long.parseLong(in);
+        refreshToken = getParameter("\"refresh_token\"");
+        scope = getParameter("\"scope\"");
+        state = getParameter("\"state\"");
     }
 
-    public AccessToken(String access_token,String refresh_token) {
-        this.access_token = access_token;
-        this.refresh_token = refresh_token;
+    public AccessToken(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
     public String getToken() {
-        return access_token;
+        return accessToken;
     }
 
-    public String getRefresh_Token() {
-        return refresh_token;
+    public String getRefreshToken() {
+        return refreshToken;
     }
 
 
     public String getParameter(String parameter) {
-    	String value = null;
+        String value = null;
         for (String str : responseStr) {
-        	if (str.startsWith(parameter)) {
-        		value = str.split(":")[1];
-        		value = value.replace('"', (char) 0);
-        		value = value.replace('}', (char) 0);
-        		value = value.trim();
-            	break;
+            if (str.startsWith(parameter)) {
+                value = str.split(":")[1];
+                value = value.replace('"', (char) 0);
+                value = value.replace('}', (char) 0);
+                value = value.trim();
+                break;
             }
         }
         return value;
@@ -93,19 +94,17 @@ public class AccessToken implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof AccessToken)) return false;
-
         AccessToken that = (AccessToken) o;
-        if (!access_token.equals(that.access_token)) return false;
-        if (!refresh_token.equals(that.refresh_token)) return false;
-
+        if (!accessToken.equals(that.accessToken)) return false;
+        if (!refreshToken.equals(that.refreshToken)) return false;
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = access_token.hashCode();
-        result = 31 * result + (int)(expires_in ^ (expires_in>>>32));
-        result = 31 * result + refresh_token.hashCode();
+        int result = accessToken.hashCode();
+        result = 31 * result + (int) (expiresIn ^ (expiresIn >>> 32));
+        result = 31 * result + refreshToken.hashCode();
         result = 31 * result + scope.hashCode();
         result = 31 * result + state.hashCode();
         return result;
@@ -113,12 +112,14 @@ public class AccessToken implements Serializable {
 
     @Override
     public String toString() {
-        return "AccessToken{" +
-                "access_token='" + access_token + '\'' +
-                ", expires_in='" + Long.toString(expires_in) + '\'' +
-                ", refresh_token='" + refresh_token + '\'' + 
-                ", scope='" + scope + '\'' +           
-                ", state='" + state + '\'' +           
-                '}';
+        final StringBuilder sb = new StringBuilder();
+        sb.append("AccessToken");
+        sb.append("{state='").append(state).append('\'');
+        sb.append(", accessToken='").append(accessToken).append('\'');
+        sb.append(", expiresIn=").append(expiresIn);
+        sb.append(", refreshToken='").append(refreshToken).append('\'');
+        sb.append(", scope='").append(scope).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

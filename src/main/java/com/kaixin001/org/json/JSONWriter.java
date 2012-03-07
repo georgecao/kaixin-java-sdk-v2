@@ -1,4 +1,4 @@
-package kx2_4j.org.json;
+package com.kaixin001.org.json;
 
 import java.io.IOException;
 import java.io.Writer;

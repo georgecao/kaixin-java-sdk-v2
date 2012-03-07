@@ -24,36 +24,37 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package kx2_4j;
+package com.kaixin001;
 
 /**
  * An exception class that will be thrown when KxAPI calls are failed.<br>
  * In case the Kx server returned HTTP error code, you can get the HTTP status code using getStatusCode() method.
+ *
  * @author Yusuke Yamamoto - yusuke at mac.com
  */
-public class KxException extends Exception {
+public class KaixinException extends Exception {
     private int statusCode = -1;
     private static final long serialVersionUID = -2623309261327598087L;
 
-    public KxException(String msg) {
+    public KaixinException(String msg) {
         super(msg);
     }
 
-    public KxException(Exception cause) {
+    public KaixinException(Exception cause) {
         super(cause);
     }
 
-    public KxException(String msg, int statusCode) {
+    public KaixinException(String msg, int statusCode) {
         super(msg);
         this.statusCode = statusCode;
 
     }
 
-    public KxException(String msg, Exception cause) {
+    public KaixinException(String msg, Exception cause) {
         super(msg, cause);
     }
 
-    public KxException(String msg, Exception cause, int statusCode) {
+    public KaixinException(String msg, Exception cause, int statusCode) {
         super(msg, cause);
         this.statusCode = statusCode;
 

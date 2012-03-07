@@ -24,15 +24,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package kx2_4j;
+package com.kaixin001;
 
 
-import kx2_4j.http.AccessToken;
-import kx2_4j.http.HttpClient;
-import kx2_4j.http.PostParameter;
-import kx2_4j.http.Response;
-import kx2_4j.org.json.JSONException;
-import kx2_4j.org.json.JSONObject;
+import com.kaixin001.http.AccessToken;
+import com.kaixin001.http.HttpClient;
+import com.kaixin001.http.PostParameter;
+import com.kaixin001.http.Response;
+import com.kaixin001.org.json.JSONException;
+import com.kaixin001.org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,10 +42,10 @@ import java.util.logging.Logger;
 
 
 /**
- * A java reporesentation of the <a href="http://wiki.open.kaixin001.com/">KxSDK API</a>
+ * A java representation of the <a href="http://wiki.open.kaixin001.com/">Kaixin API</a>
  */
-public class KxSDK {
-    private static final Logger log = Logger.getLogger(KxSDK.class.getName());
+public class Kaixin {
+    private static final Logger log = Logger.getLogger(Kaixin.class.getName());
     public static String consumerKey = "";//api key
     public static String consumerSecret = "";//secret key
     public static String redirectUri = "";//需与注册信息中网站地址的域名一致，可修改域名映射在本地进行测试
@@ -58,11 +58,11 @@ public class KxSDK {
     protected HttpClient http = new HttpClient();
     protected AccessToken accessToken = null;
 
-    public String getAuthorizeURLforCode(String scope, String state, String display) {
+    public String getAuthorizeURLForCode(String scope, String state, String display) {
         return getAuthorizeURL("code", scope, state, display);
     }
 
-    public String getAuthorizeURLforToken(String scope, String state, String display) {
+    public String getAuthorizeURLForToken(String scope, String state, String display) {
         return getAuthorizeURL("token", scope, state, display);
     }
 
@@ -78,7 +78,7 @@ public class KxSDK {
         return authorizationURL + "?" + query;
     }
 
-    public AccessToken getOAuthAccessTokenFromCode(String code) throws KxException {
+    public AccessToken getOAuthAccessTokenFromCode(String code) throws KaixinException {
         AccessToken oauthToken = null;
         try {
             PostParameter[] params = new PostParameter[5];
@@ -89,13 +89,13 @@ public class KxSDK {
             params[4] = new PostParameter("redirect_uri", redirectUri);
 
             oauthToken = new AccessToken(http.get(accessTokenURL, params));
-        } catch (KxException te) {
-            throw new KxException("The user has not given access to the account.", te, te.getStatusCode());
+        } catch (KaixinException te) {
+            throw new KaixinException("The user has not given access to the account.", te, te.getStatusCode());
         }
         return oauthToken;
     }
 
-    public AccessToken getOAuthAccessTokenFromPassword(String username, String password, String scope) throws KxException {
+    public AccessToken getOAuthAccessTokenFromPassword(String username, String password, String scope) throws KaixinException {
         AccessToken oauthToken = null;
         try {
             PostParameter[] params = new PostParameter[6];
@@ -106,24 +106,24 @@ public class KxSDK {
             params[4] = new PostParameter("password", password);
             params[5] = new PostParameter("scope", scope);
             oauthToken = new AccessToken(http.get(accessTokenURLssl, params));
-        } catch (KxException te) {
-            throw new KxException("The user has not given access to the account.", te, te.getStatusCode());
+        } catch (KaixinException te) {
+            throw new KaixinException("The user has not given access to the account.", te, te.getStatusCode());
         }
         return oauthToken;
     }
 
-    public AccessToken getOAuthAccessTokenFromRefreshtoken(String refresh_token, String scope) throws KxException {
+    public AccessToken getOAuthAccessTokenFromRefreshToken(String refreshToken, String scope) throws KaixinException {
         AccessToken oauthToken = null;
         try {
             PostParameter[] params = new PostParameter[5];
             params[0] = new PostParameter("grant_type", "refresh_token");
             params[1] = new PostParameter("client_id", consumerKey);
             params[2] = new PostParameter("client_secret", consumerSecret);
-            params[3] = new PostParameter("refresh_token", refresh_token);
+            params[3] = new PostParameter("refresh_token", refreshToken);
             params[4] = new PostParameter("scope", scope);
             oauthToken = new AccessToken(http.get(accessTokenURL, params));
-        } catch (KxException te) {
-            throw new KxException("The user has not given access to the account.", te, te.getStatusCode());
+        } catch (KaixinException te) {
+            throw new KaixinException("The user has not given access to the account.", te, te.getStatusCode());
         }
         return oauthToken;
     }
@@ -141,11 +141,11 @@ public class KxSDK {
             return false;
         }
 
-        KxSDK kxSDK = (KxSDK) o;
-        if (!http.equals(kxSDK.http)) {
+        Kaixin kaixin = (Kaixin) o;
+        if (!http.equals(kaixin.http)) {
             return false;
         }
-        if (!accessToken.equals(kxSDK.accessToken)) {
+        if (!accessToken.equals(kaixin.accessToken)) {
             return false;
         }
 
@@ -161,14 +161,14 @@ public class KxSDK {
 
     @Override
     public String toString() {
-        return "KxSDK{"
+        return "Kaixin{"
                 + "http=" + http
                 + ", accessToken='" + accessToken + '\''
                 + '}';
     }
 
 
-    public User getMyInfo(String fields) throws KxException {
+    public User getMyInfo(String fields) throws KaixinException {
         PostParameter[] params = new PostParameter[2];
         params[0] = new PostParameter("access_token", this.accessToken.getToken());
         if (null == fields) fields = "";
@@ -177,11 +177,11 @@ public class KxSDK {
     }
 
 
-    public List<User> getUsers(String uids, String fields, int start, int num) throws KxException {
-        if (uids.length() == 0) throw new KxException("app_param_lost");
+    public List<User> getUsers(String uids, String fields, int start, int num) throws KaixinException {
+        if (uids.length() == 0) throw new KaixinException("app_param_lost");
         String[] uidArr = uids.split(",");
         int uidNum = uidArr.length;
-        if (uidNum > 50) throw new KxException("app_uids_wrong");
+        if (uidNum > 50) throw new KaixinException("app_uids_wrong");
 
         PostParameter[] params = new PostParameter[5];
         params[0] = new PostParameter("access_token", this.accessToken.getToken());
@@ -195,7 +195,7 @@ public class KxSDK {
         return User.constructUser(get("users/show", params));
     }
 
-    public List<User> getFriends(String fields, int start, int num) throws KxException {
+    public List<User> getFriends(String fields, int start, int num) throws KaixinException {
         PostParameter[] params = new PostParameter[4];
         params[0] = new PostParameter("access_token", this.accessToken.getToken());
         if (null == fields) fields = "";
@@ -207,9 +207,9 @@ public class KxSDK {
         return User.constructUser(get("friends/me", params));
     }
 
-    public int getRelationShip(long uid1, long uid2) throws KxException {
+    public int getRelationShip(long uid1, long uid2) throws KaixinException {
         if (uid1 <= 0 || uid2 <= 0) {
-            throw new KxException("app_param_lost");
+            throw new KaixinException("app_param_lost");
         }
         PostParameter[] params = new PostParameter[3];
         params[0] = new PostParameter("access_token", this.accessToken.getToken());
@@ -227,11 +227,11 @@ public class KxSDK {
     }
 
 
-    public List<AppStatus> getAppStatus(String uids, int start, int num) throws KxException {
-        if (uids.length() == 0) throw new KxException("app_param_lost");
+    public List<AppStatus> getAppStatus(String uids, int start, int num) throws KaixinException {
+        if (uids.length() == 0) throw new KaixinException("app_param_lost");
         String[] uidArr = uids.split(",");
         int uidNum = uidArr.length;
-        if (uidNum > 50) throw new KxException("app_uids_wrong");
+        if (uidNum > 50) throw new KaixinException("app_uids_wrong");
 
         PostParameter[] params = new PostParameter[4];
         params[0] = new PostParameter("access_token", this.accessToken.getToken());
@@ -245,7 +245,7 @@ public class KxSDK {
         return AppStatus.constructStatus(get("app/status", params));
     }
 
-    public UIDs getAppFriendUids(int start, int num) throws KxException {
+    public UIDs getAppFriendUids(int start, int num) throws KaixinException {
         PostParameter[] params = new PostParameter[3];
         params[0] = new PostParameter("access_token", this.accessToken.getToken());
         if (start < 0) start = 0;
@@ -255,9 +255,9 @@ public class KxSDK {
         return new UIDs(get("app/friends", params), this);
     }
 
-    public InvitedUIDs getAppInvitedUids(long uid, int start, int num) throws KxException {
+    public InvitedUIDs getAppInvitedUids(long uid, int start, int num) throws KaixinException {
         if (uid <= 0) {
-            throw new KxException("app_param_lost");
+            throw new KaixinException("app_param_lost");
         }
 
         PostParameter[] params = new PostParameter[4];
@@ -287,9 +287,9 @@ public class KxSDK {
      * @param picUrl   Optional.
      *                 发送动态所使用的图片地址，如果动态分享中需要发布图片，则此项必填。 单张图片时，大小为80×80。
      * @return an instance of {@link Response}
-     * @throws KxException
+     * @throws KaixinException
      */
-    public Response sendSysnews(String fuids, String linkText, String link, String text, String word, String picUrl) throws KxException {
+    public Response sendSysNews(String fuids, String linkText, String link, String text, String word, String picUrl) throws KaixinException {
         List<PostParameter> params = new ArrayList<PostParameter>(7);
         params.add(new PostParameter("fuids", fuids));
         params.add(new PostParameter("linktext", linkText));
@@ -327,11 +327,11 @@ public class KxSDK {
      * @param picUrl      Optional.
      *                    外部图片链接，图片在10M以内，格式支持jpg/jpeg/gif/png/bmp *pic和picurl只能选择其一，两个同时提交时，只取pic
      * @return an instance of {@link Response}
-     * @throws KxException
+     * @throws KaixinException
      */
-    public long postRecord(String content, Integer saveToAlbum, String location, String lat, String lon, Integer syncStatus, Integer privacy, String pic, String picUrl) throws KxException {
+    public long postRecord(String content, Integer saveToAlbum, String location, String lat, String lon, Integer syncStatus, Integer privacy, String pic, String picUrl) throws KaixinException {
         if (content == null || content.length() <= 0) {
-            throw new KxException("records content can't be null!");
+            throw new KaixinException("records content can't be null!");
         }
         if (saveToAlbum == null) saveToAlbum = 0;
         if (location == null) location = "";
@@ -370,29 +370,29 @@ public class KxSDK {
         return rid;
     }
 
-    public long album_create(String title, Integer privacy, String password, Integer category, Integer allow_repaste, String location, String description) throws KxException {
+    public long createAlbum(String title, Integer privacy, String password, Integer category, Integer allowRepaste, String location, String description) throws KaixinException {
         PostParameter[] params = new PostParameter[8];
         params[0] = new PostParameter("title", title);
         params[1] = new PostParameter("privacy", privacy);
         params[2] = new PostParameter("password", password);
         params[3] = new PostParameter("category", category);
-        params[4] = new PostParameter("allow_repaste", allow_repaste);
+        params[4] = new PostParameter("allow_repaste", allowRepaste);
         params[5] = new PostParameter("location", location);
         params[6] = new PostParameter("description", description);
         params[7] = new PostParameter("access_token", this.accessToken.getToken());
         Response res = post("album/create", params);
 
         JSONObject json = res.asJSONObject();
-        long albumid = 0;
+        long albumId = 0;
         try {
-            albumid = json.getLong(("albumid"));
+            albumId = json.getLong(("albumid"));
         } catch (JSONException ex) {
             log.log(Level.SEVERE, null, ex);
         }
-        return albumid;
+        return albumId;
     }
 
-    public Response album_show(long uid, long start, long num) throws KxException {
+    public Response showAlbum(long uid, long start, long num) throws KaixinException {
         PostParameter[] params = new PostParameter[4];
         params[0] = new PostParameter("uid", uid);
         params[1] = new PostParameter("start", start);
@@ -401,9 +401,9 @@ public class KxSDK {
         return get("album/show", params);
     }
 
-    public Response photo_upload(long albumid, String title, String size, Integer send_news, String pic) throws KxException {
+    public Response uploadPhoto(long albumId, String title, String size, Integer send_news, String pic) throws KaixinException {
         PostParameter[] params = new PostParameter[5];
-        params[0] = new PostParameter("albumid", albumid);
+        params[0] = new PostParameter("albumid", albumId);
         params[1] = new PostParameter("title", title);
         params[2] = new PostParameter("size", size);
         params[3] = new PostParameter("send_news", send_news);
@@ -417,10 +417,10 @@ public class KxSDK {
         return http.multPartURL("pic", baseURL + "photo/upload" + "." + format, params, picFile);
     }
 
-    public Response photo_show(long uid, long albumid, long pid, String password, long start, long num) throws KxException {
+    public Response showPhoto(long uid, long albumId, long pid, String password, long start, long num) throws KaixinException {
         PostParameter[] params = new PostParameter[7];
         params[0] = new PostParameter("uid", uid);
-        params[1] = new PostParameter("albumid", albumid);
+        params[1] = new PostParameter("albumid", albumId);
         params[2] = new PostParameter("pid", pid);
         params[3] = new PostParameter("password", password);
         params[4] = new PostParameter("start", start);
@@ -430,22 +430,21 @@ public class KxSDK {
     }
 
     //--------------base method----------
-
-    protected Response get(String api, PostParameter[] params) throws KxException {
+    protected Response get(String api, PostParameter[] params) throws KaixinException {
         api = baseURL + api + "." + format;
         return http.get(api, params);
     }
 
-    protected Response post(String api, PostParameter[] params) throws KxException {
+    protected Response post(String api, PostParameter[] params) throws KaixinException {
         api = baseURL + api + "." + format;
         return http.post(api, params);
     }
 
-    protected Response get(String api, List<PostParameter> params) throws KxException {
+    protected Response get(String api, List<PostParameter> params) throws KaixinException {
         return get(api, params.toArray(new PostParameter[params.size()]));
     }
 
-    protected Response post(String api, List<PostParameter> params) throws KxException {
+    protected Response post(String api, List<PostParameter> params) throws KaixinException {
         return post(api, params.toArray(new PostParameter[params.size()]));
     }
 }

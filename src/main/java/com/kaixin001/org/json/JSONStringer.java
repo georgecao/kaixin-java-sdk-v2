@@ -1,4 +1,4 @@
-package kx2_4j.org.json;
+package com.kaixin001.org.json;
 
 /*
 Copyright (c) 2006 JSON.org

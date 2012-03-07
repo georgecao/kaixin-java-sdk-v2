@@ -24,12 +24,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package kx2_4j;
+package com.kaixin001;
 
-import kx2_4j.http.Response;
-import kx2_4j.org.json.JSONArray;
-import kx2_4j.org.json.JSONException;
-import kx2_4j.org.json.JSONObject;
+import com.kaixin001.http.Response;
+import com.kaixin001.org.json.JSONArray;
+import com.kaixin001.org.json.JSONException;
+import com.kaixin001.org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -41,10 +41,10 @@ import java.util.List;
 /**
  * A data class representing Basic user information element
  */
-public class User extends KxResponse implements java.io.Serializable {
+public class User extends KaixinResponse implements java.io.Serializable {
 
     static final String[] POSSIBLE_ROOT_NAMES = new String[]{"user", "sender", "recipient", "retweeting_user"};
-    private KxSDK kxSDK;
+    private Kaixin kaixin;
     private long uid;
     private String name;
     private int gender;     // 性别, 1.男, 2.女, 0.未知
@@ -80,23 +80,23 @@ public class User extends KxResponse implements java.io.Serializable {
     private int isStar;         // 0,非明星；1：明星
     private static final long serialVersionUID = -6345893237975349030L;
 
-    public User(Response res, KxSDK kxSDK) throws KxException {
+    public User(Response res, Kaixin kaixin) throws KaixinException {
         super(res);
         Element elem = res.asDocument().getDocumentElement();
-        init(elem, kxSDK);
+        init(elem, kaixin);
     }
 
-    public User(Response res, Element elem, KxSDK kxSDK) throws KxException {
+    public User(Response res, Element elem, Kaixin kaixin) throws KaixinException {
         super(res);
-        init(elem, kxSDK);
+        init(elem, kaixin);
     }
 
-    public User(JSONObject json) throws KxException {
+    public User(JSONObject json) throws KaixinException {
         super();
         init(json);
     }
 
-    private void init(JSONObject json) throws KxException {
+    private void init(JSONObject json) throws KaixinException {
         if (json != null) {
             try {
                 uid = json.getLong("uid");
@@ -149,13 +149,13 @@ public class User extends KxResponse implements java.io.Serializable {
                 isStar = json.getInt("isStar");
                 gender = json.getInt("gender");
             } catch (JSONException jsone) {
-                throw new KxException(jsone.getMessage() + ":" + json.toString(), jsone);
+                throw new KaixinException(jsone.getMessage() + ":" + json.toString(), jsone);
             }
         }
     }
 
-    private void init(Element elem, KxSDK kxSDK) throws KxException {
-        this.kxSDK = kxSDK;
+    private void init(Element elem, Kaixin kaixin) throws KaixinException {
+        this.kaixin = kaixin;
         ensureRootNodeNameIs(POSSIBLE_ROOT_NAMES, elem);
         uid = getChildLong("uid", elem);
         name = getChildText("name", elem);
@@ -230,7 +230,7 @@ public class User extends KxResponse implements java.io.Serializable {
         return city;
     }
 
-    public static List<User> constructUser(Response res) throws KxException {
+    public static List<User> constructUser(Response res) throws KaixinException {
 
         JSONObject json = res.asJSONObject();
         try {
@@ -249,12 +249,12 @@ public class User extends KxResponse implements java.io.Serializable {
 
 
         } catch (JSONException je) {
-            throw new KxException(je);
+            throw new KaixinException(je);
         }
 
     }
 
-    public static List<User> constructUsers(Response res, KxSDK kxSDK) throws KxException {
+    public static List<User> constructUsers(Response res, Kaixin kaixin) throws KaixinException {
         Document doc = res.asDocument();
         if (isRootNodeNilClasses(doc)) {
             return new ArrayList<User>(0);
@@ -266,7 +266,7 @@ public class User extends KxResponse implements java.io.Serializable {
 //                int size = list.getLength();
 //                List<User> users = new ArrayList<User>(size);
 //                for (int i = 0; i < size; i++) {
-//                    users.add(new User(res, (Element) list.item(i), kxSDK));
+//                    users.add(new User(res, (Element) list.item(i), kaixin));
 //                }
 
                 //去除掉嵌套的bug
@@ -276,12 +276,12 @@ public class User extends KxResponse implements java.io.Serializable {
                 for (int i = 0; i < list.getLength(); i++) {
                     node = list.item(i);
                     if (node.getNodeName().equals("user")) {
-                        users.add(new User(res, (Element) node, kxSDK));
+                        users.add(new User(res, (Element) node, kaixin));
                     }
                 }
 
                 return users;
-            } catch (KxException te) {
+            } catch (KaixinException te) {
                 if (isRootNodeNilClasses(doc)) {
                     return new ArrayList<User>(0);
                 } else {
@@ -291,10 +291,10 @@ public class User extends KxResponse implements java.io.Serializable {
         }
     }
 
-    public static UserWapper constructWapperUsers(Response res, KxSDK kxSDK) throws KxException {
+    public static UserWrapper constructWapperUsers(Response res, Kaixin kaixin) throws KaixinException {
         Document doc = res.asDocument();
         if (isRootNodeNilClasses(doc)) {
-            return new UserWapper(new ArrayList<User>(0), 0, 0);
+            return new UserWrapper(new ArrayList<User>(0), 0, 0);
         } else {
             try {
                 ensureRootNodeNameIs("users_list", doc);
@@ -302,7 +302,7 @@ public class User extends KxResponse implements java.io.Serializable {
                 NodeList user = root.getElementsByTagName("users");
                 int length = user.getLength();
                 if (length == 0) {
-                    return new UserWapper(new ArrayList<User>(0), 0, 0);
+                    return new UserWrapper(new ArrayList<User>(0), 0, 0);
                 }
                 // 
                 Element listsRoot = (Element) user.item(0);
@@ -312,7 +312,7 @@ public class User extends KxResponse implements java.io.Serializable {
                 for (int i = 0; i < list.getLength(); i++) {
                     node = list.item(i);
                     if (node.getNodeName().equals("user")) {
-                        users.add(new User(res, (Element) node, kxSDK));
+                        users.add(new User(res, (Element) node, kaixin));
                     }
                 }
                 //
@@ -321,10 +321,10 @@ public class User extends KxResponse implements java.io.Serializable {
                 if (nextCursor == -1) { // 兼容不同标签名称
                     nextCursor = getChildLong("nextCurosr", root);
                 }
-                return new UserWapper(users, previousCursor, nextCursor);
-            } catch (KxException te) {
+                return new UserWrapper(users, previousCursor, nextCursor);
+            } catch (KaixinException te) {
                 if (isRootNodeNilClasses(doc)) {
-                    return new UserWapper(new ArrayList<User>(0), 0, 0);
+                    return new UserWrapper(new ArrayList<User>(0), 0, 0);
                 } else {
                     throw te;
                 }
@@ -332,7 +332,7 @@ public class User extends KxResponse implements java.io.Serializable {
         }
     }
 
-    public static List<User> constructUsers(Response res) throws KxException {
+    public static List<User> constructUsers(Response res) throws KaixinException {
         try {
             JSONArray list = res.asJSONArray();
             int size = list.length();
@@ -342,8 +342,8 @@ public class User extends KxResponse implements java.io.Serializable {
             }
             return users;
         } catch (JSONException jsone) {
-            throw new KxException(jsone);
-        } catch (KxException te) {
+            throw new KaixinException(jsone);
+        } catch (KaixinException te) {
             throw te;
         }
     }
@@ -352,9 +352,9 @@ public class User extends KxResponse implements java.io.Serializable {
      * 
      * @param res
      * @return
-     * @throws KxException
+     * @throws KaixinException
      */
-    public static UserWapper constructWapperUsers(Response res) throws KxException {
+    public static UserWrapper constructWapperUsers(Response res) throws KaixinException {
         JSONObject jsonUsers = res.asJSONObject(); //asJSONArray();
         try {
             JSONArray user = jsonUsers.getJSONArray("users");
@@ -368,18 +368,18 @@ public class User extends KxResponse implements java.io.Serializable {
             if (nextCursor == -1) { // 兼容不同标签名称
                 nextCursor = jsonUsers.getLong("nextCursor");
             }
-            return new UserWapper(users, previousCursor, nextCursor);
+            return new UserWrapper(users, previousCursor, nextCursor);
         } catch (JSONException jsone) {
-            throw new KxException(jsone);
+            throw new KaixinException(jsone);
         }
     }
 
     /**
      * @param res 
      * @return 
-     * @throws KxException
+     * @throws KaixinException
      */
-    public static List<User> constructResult(Response res) throws KxException {
+    public static List<User> constructResult(Response res) throws KaixinException {
         JSONArray list = res.asJSONArray();
         try {
             int size = list.length();
@@ -533,7 +533,7 @@ public class User extends KxResponse implements java.io.Serializable {
         }
 
         return "User{"
-                + "KxSDK=" + kxSDK
+                + "Kaixin=" + kaixin
                 + ", uid=" + uid
                 + ", name='" + name + '\''
                 + ", logo120='" + logo120 + '\''
@@ -579,11 +579,11 @@ public class User extends KxResponse implements java.io.Serializable {
         private String strClass;
         private String year;
 
-        public Education(JSONObject json) throws KxException {
+        public Education(JSONObject json) throws KaixinException {
             init(json);
         }
 
-        private void init(JSONObject json) throws KxException {
+        private void init(JSONObject json) throws KaixinException {
             if (json != null) {
                 try {
                     schooltype = json.getString("schooltype");
@@ -591,7 +591,7 @@ public class User extends KxResponse implements java.io.Serializable {
                     strClass = json.getString("strClass");
                     year = json.getString("year");
                 } catch (JSONException jsone) {
-                    throw new KxException(jsone.getMessage() + ":" + json.toString(), jsone);
+                    throw new KaixinException(jsone.getMessage() + ":" + json.toString(), jsone);
                 }
             }
         }
@@ -631,11 +631,11 @@ public class User extends KxResponse implements java.io.Serializable {
         private String endyear;
         private String endmonth;
 
-        public Career(JSONObject json) throws KxException {
+        public Career(JSONObject json) throws KaixinException {
             init(json);
         }
 
-        private void init(JSONObject json) throws KxException {
+        private void init(JSONObject json) throws KaixinException {
             if (json != null) {
                 try {
                     company = json.getString("company");
@@ -645,7 +645,7 @@ public class User extends KxResponse implements java.io.Serializable {
                     endyear = json.getString("endyear");
                     endmonth = json.getString("endmonth");
                 } catch (JSONException jsone) {
-                    throw new KxException(jsone.getMessage() + ":" + json.toString(), jsone);
+                    throw new KaixinException(jsone.getMessage() + ":" + json.toString(), jsone);
                 }
             }
         }

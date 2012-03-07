@@ -24,9 +24,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package kx2_4j.http;
+package com.kaixin001.http;
 
-import kx2_4j.KxException;
+import com.kaixin001.KaixinException;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
@@ -57,9 +57,9 @@ public class HttpClient implements java.io.Serializable {
     private static final int FORBIDDEN = 403;// Forbidden: The request is understood, but it has been refused.  An accompanying error message will explain why.
     private static final int NOT_FOUND = 404;// Not Found: The URI requested is invalid or the resource requested, such as a user, does not exists.
     private static final int NOT_ACCEPTABLE = 406;// Not Acceptable: Returned by the Search API when an invalid format is specified in the request.
-    private static final int INTERNAL_SERVER_ERROR = 500;// Internal Server Error: Something is broken.  Please post to the group so the KxSDK team can investigate.
-    private static final int BAD_GATEWAY = 502;// Bad Gateway: KxSDK is down or being upgraded.
-    private static final int SERVICE_UNAVAILABLE = 503;// Service Unavailable: The KxSDK servers are up, but overloaded with requests. Try again later. The search and trend methods use this to indicate when you are being rate limited.
+    private static final int INTERNAL_SERVER_ERROR = 500;// Internal Server Error: Something is broken.  Please post to the group so the Kaixin team can investigate.
+    private static final int BAD_GATEWAY = 502;// Bad Gateway: Kaixin is down or being upgraded.
+    private static final int SERVICE_UNAVAILABLE = 503;// Service Unavailable: The Kaixin servers are up, but overloaded with requests. Try again later. The search and trend methods use this to indicate when you are being rate limited.
 
 
     private int retryCount = 3;
@@ -91,7 +91,7 @@ public class HttpClient implements java.io.Serializable {
 		 return client;
     }
     
- 	public Response multPartURL(String fileParamName,String url,  PostParameter[] params,File file) throws KxException{
+ 	public Response multPartURL(String fileParamName,String url,  PostParameter[] params,File file) throws KaixinException {
   		PostMethod post = new PostMethod(url);
   		org.apache.commons.httpclient.HttpClient client = getHttpClient();
   		try {
@@ -122,13 +122,13 @@ public class HttpClient implements java.io.Serializable {
     		log("multPartURL URL:" + url + ", result:" + response + ", time:" + (System.currentTimeMillis() - t));
         	return response;
     	} catch (Exception ex) {
-    		 throw new KxException(ex.getMessage(), ex, -1);
+    		 throw new KaixinException(ex.getMessage(), ex, -1);
     	} finally {
     		post.releaseConnection();
     		client=null;
     	}
   	}
- 	public Response get(String url, PostParameter[] params) throws KxException {
+ 	public Response get(String url, PostParameter[] params) throws KaixinException {
         if (url.indexOf("?") == -1) {
             url += "?";
         }
@@ -139,19 +139,19 @@ public class HttpClient implements java.io.Serializable {
         return httpRequest(url, null, "GET");
     }
  	
-    public Response post(String url, PostParameter[] postParameters) throws KxException {
+    public Response post(String url, PostParameter[] postParameters) throws KaixinException {
         return httpRequest(url, postParameters, "POST");
     }
 
-    public Response delete(String url) throws KxException {
+    public Response delete(String url) throws KaixinException {
     	return httpRequest(url, null, "DELETE");
     }
  
-    public Response httpRequest(String url, PostParameter[] postParams,String httpMethod) throws KxException {
+    public Response httpRequest(String url, PostParameter[] postParams,String httpMethod) throws KaixinException {
         int retriedCount;
         int retry = retryCount + 1;
         Response res = null;
-        _FakeX509TrustManager.allowAllSSL();//����
+        FakeX509TrustManager.allowAllSSL();//����
         for (retriedCount = 0; retriedCount < retry; retriedCount++) {
             int responseCode = -1;
             try {
@@ -205,7 +205,7 @@ public class HttpClient implements java.io.Serializable {
                     }
                     if (responseCode != OK) {
                         if (responseCode < INTERNAL_SERVER_ERROR || retriedCount == retryCount) {
-                            throw new KxException(getCause(responseCode) + "\n" + res.asString(), responseCode);
+                            throw new KaixinException(getCause(responseCode) + "\n" + res.asString(), responseCode);
                         }
                         // will retry if the status code is INTERNAL_SERVER_ERROR
                     } else {
@@ -220,7 +220,7 @@ public class HttpClient implements java.io.Serializable {
             } catch (IOException ioe) {
                 // connection timeout or read timeout
                 if (retriedCount == retryCount) {
-                    throw new KxException(ioe.getMessage(), ioe, responseCode);
+                    throw new KaixinException(ioe.getMessage(), ioe, responseCode);
                 }
             }
             try {

@@ -1,14 +1,14 @@
 <%@ page contentType="text/html;charset=utf-8" %>
-<%@ page language="java" import="kx2_4j.http.AccessToken" %>
+<%@ page language="java" import="com.kaixin001.http.AccessToken" %>
 <%@ page language="java" %>
 
-<jsp:useBean id="connection" scope="session" class="kx2_4j.KxSDK"/>
+<jsp:useBean id="connection" scope="session" class="com.kaixin001.Kaixin"/>
 <%
     String scope = "create_records create_album user_photo friends_photo upload_photo";
     if ("1".equals(request.getParameter("opt"))) {
-        response.sendRedirect(connection.getAuthorizeURLforCode(scope, "", ""));
+        response.sendRedirect(connection.getAuthorizeURLForCode(scope, "", ""));
     } else if ("2".equals(request.getParameter("opt"))) {
-        response.sendRedirect(connection.getAuthorizeURLforToken(scope, "", ""));
+        response.sendRedirect(connection.getAuthorizeURLForToken(scope, "", ""));
     } else if ("3".equals(request.getParameter("opt"))) {
         String username = "";
         String password = "";
@@ -24,7 +24,7 @@
     } else if ("4".equals(request.getParameter("opt"))) {
 
         String refresh_token = "";
-        AccessToken accessToken = connection.getOAuthAccessTokenFromRefreshtoken(refresh_token, scope);
+        AccessToken accessToken = connection.getOAuthAccessTokenFromRefreshToken(refresh_token, scope);
         if (accessToken != null)//
         {
             String access_token = accessToken.getToken();

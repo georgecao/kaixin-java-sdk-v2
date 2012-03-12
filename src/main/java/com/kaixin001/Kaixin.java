@@ -42,24 +42,24 @@ import java.util.logging.Logger;
 
 
 /**
- * A java representation of the <a href="http://wiki.open.kaixin001.com/">Kaixin API</a>
+ * A java representation of the <a href="http://wiki.open.kaixin001.com/">Kaixin API</a>.
  */
 public class Kaixin {
-    private static final Logger log = Logger.getLogger(Kaixin.class.getName());
-    public static String consumerKey = "";//api key
-    public static String consumerSecret = "";//secret key
-    public static String redirectUri = "";//需与注册信息中网站地址的域名一致，可修改域名映射在本地进行测试
-    public static String baseURL = "https://api.kaixin001.com/";
-    public static String authorizationURL = "http://api.kaixin001.com/oauth2/authorize";
-    public static String accessTokenURL = "http://api.kaixin001.com/oauth2/access_token";
-    public static String accessTokenURLssl = "https://api.kaixin001.com/oauth2/access_token";
-    public static String format = "json";
+    private static final Logger LOG = Logger.getLogger(Kaixin.class.getName());
+    public static String consumerKey = ""; //api key
+    public static String consumerSecret = ""; //secret key
+    public static String redirectUri = ""; //需与注册信息中网站地址的域名一致，可修改域名映射在本地进行测试
+    public static final String baseURL = "https://api.kaixin001.com/";
+    public static final String authorizationURL = "http://api.kaixin001.com/oauth2/authorize";
+    public static final String accessTokenURL = "http://api.kaixin001.com/oauth2/access_token";
+    public static final String accessTokenURLSsl = "https://api.kaixin001.com/oauth2/access_token";
+    public static final String format = "json";
 
-    protected HttpClient http = new HttpClient();
+    protected static final HttpClient http = new HttpClient();
     protected AccessToken accessToken = null;
 
     public String getAuthorizeURLForCode(String scope, String state, String display) {
-        return getAuthorizeURL("code", scope, state, display);
+        return getAuthorizeURL(OAuthConstants.CODE, scope, state, display);
     }
 
     public String getAuthorizeURLForToken(String scope, String state, String display) {
@@ -68,11 +68,11 @@ public class Kaixin {
 
     protected String getAuthorizeURL(String type, String scope, String state, String display) {
         PostParameter[] params = new PostParameter[6];
-        params[0] = new PostParameter("response_type", type);
-        params[1] = new PostParameter("client_id", consumerKey);
-        params[2] = new PostParameter("redirect_uri", redirectUri);
-        params[3] = new PostParameter("scope", scope);
-        params[4] = new PostParameter("state", state);
+        params[0] = new PostParameter(OAuthConstants.RESPONSE_TYPE, type);
+        params[1] = new PostParameter(OAuthConstants.CLIENT_ID, consumerKey);
+        params[2] = new PostParameter(OAuthConstants.REDIRECT_URI, redirectUri);
+        params[3] = new PostParameter(OAuthConstants.SCOPE, scope);
+        params[4] = new PostParameter(OAuthConstants.STATE, state);
         params[5] = new PostParameter("display", display);
         String query = HttpClient.encodeParameters(params);
         return authorizationURL + "?" + query;
@@ -82,11 +82,11 @@ public class Kaixin {
         AccessToken oauthToken = null;
         try {
             PostParameter[] params = new PostParameter[5];
-            params[0] = new PostParameter("grant_type", "authorization_code");
-            params[1] = new PostParameter("client_id", consumerKey);
-            params[2] = new PostParameter("client_secret", consumerSecret);
-            params[3] = new PostParameter("code", code);
-            params[4] = new PostParameter("redirect_uri", redirectUri);
+            params[0] = new PostParameter(OAuthConstants.GRANT_TYPE, OAuthConstants.AUTHORIZATION_CODE);
+            params[1] = new PostParameter(OAuthConstants.CLIENT_ID, consumerKey);
+            params[2] = new PostParameter(OAuthConstants.CLIENT_SECRET, consumerSecret);
+            params[3] = new PostParameter(OAuthConstants.CODE, code);
+            params[4] = new PostParameter(OAuthConstants.REDIRECT_URI, redirectUri);
 
             oauthToken = new AccessToken(http.get(accessTokenURL, params));
         } catch (KaixinException te) {
@@ -99,13 +99,13 @@ public class Kaixin {
         AccessToken oauthToken = null;
         try {
             PostParameter[] params = new PostParameter[6];
-            params[0] = new PostParameter("grant_type", "password");
-            params[1] = new PostParameter("client_id", consumerKey);
-            params[2] = new PostParameter("client_secret", consumerSecret);
-            params[3] = new PostParameter("username", username);
-            params[4] = new PostParameter("password", password);
-            params[5] = new PostParameter("scope", scope);
-            oauthToken = new AccessToken(http.get(accessTokenURLssl, params));
+            params[0] = new PostParameter(OAuthConstants.GRANT_TYPE, OAuthConstants.PASSWORD);
+            params[1] = new PostParameter(OAuthConstants.CLIENT_ID, consumerKey);
+            params[2] = new PostParameter(OAuthConstants.CLIENT_SECRET, consumerSecret);
+            params[3] = new PostParameter(OAuthConstants.USERNAME, username);
+            params[4] = new PostParameter(OAuthConstants.PASSWORD, password);
+            params[5] = new PostParameter(OAuthConstants.SCOPE, scope);
+            oauthToken = new AccessToken(http.get(accessTokenURLSsl, params));
         } catch (KaixinException te) {
             throw new KaixinException("The user has not given access to the account.", te, te.getStatusCode());
         }
@@ -116,11 +116,11 @@ public class Kaixin {
         AccessToken oauthToken = null;
         try {
             PostParameter[] params = new PostParameter[5];
-            params[0] = new PostParameter("grant_type", "refresh_token");
-            params[1] = new PostParameter("client_id", consumerKey);
-            params[2] = new PostParameter("client_secret", consumerSecret);
-            params[3] = new PostParameter("refresh_token", refreshToken);
-            params[4] = new PostParameter("scope", scope);
+            params[0] = new PostParameter(OAuthConstants.GRANT_TYPE, OAuthConstants.REFRESH_TOKEN);
+            params[1] = new PostParameter(OAuthConstants.CLIENT_ID, consumerKey);
+            params[2] = new PostParameter(OAuthConstants.CLIENT_SECRET, consumerSecret);
+            params[3] = new PostParameter(OAuthConstants.REFRESH_TOKEN, refreshToken);
+            params[4] = new PostParameter(OAuthConstants.SCOPE, scope);
             oauthToken = new AccessToken(http.get(accessTokenURL, params));
         } catch (KaixinException te) {
             throw new KaixinException("The user has not given access to the account.", te, te.getStatusCode());
@@ -148,7 +148,6 @@ public class Kaixin {
         if (!accessToken.equals(kaixin.accessToken)) {
             return false;
         }
-
         return true;
     }
 
@@ -170,8 +169,10 @@ public class Kaixin {
 
     public User getMyInfo(String fields) throws KaixinException {
         PostParameter[] params = new PostParameter[2];
-        params[0] = new PostParameter("access_token", this.accessToken.getToken());
-        if (null == fields) fields = "";
+        params[0] = new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken());
+        if (null == fields) {
+            fields = "";
+        }
         params[1] = new PostParameter("fields", fields);
         return new User(get("users/me", params).asJSONObject());
     }
@@ -184,7 +185,7 @@ public class Kaixin {
         if (uidNum > 50) throw new KaixinException("app_uids_wrong");
 
         PostParameter[] params = new PostParameter[5];
-        params[0] = new PostParameter("access_token", this.accessToken.getToken());
+        params[0] = new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken());
         if (null == fields) fields = "";
         if (start < 0) start = 0;
         if (num < 0 || num > 50) num = 20;
@@ -197,7 +198,7 @@ public class Kaixin {
 
     public List<User> getFriends(String fields, int start, int num) throws KaixinException {
         PostParameter[] params = new PostParameter[4];
-        params[0] = new PostParameter("access_token", this.accessToken.getToken());
+        params[0] = new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken());
         if (null == fields) fields = "";
         if (start < 0) start = 0;
         if (num < 0 || num > 50) num = 20;
@@ -212,7 +213,7 @@ public class Kaixin {
             throw new KaixinException("app_param_lost");
         }
         PostParameter[] params = new PostParameter[3];
-        params[0] = new PostParameter("access_token", this.accessToken.getToken());
+        params[0] = new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken());
         params[1] = new PostParameter("uid1", uid1);
         params[2] = new PostParameter("uid2", uid2);
         JSONObject json = get("friends/relationship", params).asJSONObject();
@@ -234,10 +235,13 @@ public class Kaixin {
         if (uidNum > 50) throw new KaixinException("app_uids_wrong");
 
         PostParameter[] params = new PostParameter[4];
-        params[0] = new PostParameter("access_token", this.accessToken.getToken());
-        if (start < 0) start = 0;
-        if (num < 0 || num > 50) num = 20;
-
+        params[0] = new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken());
+        if (start < 0) {
+            start = 0;
+        }
+        if (num < 0 || num > 50) {
+            num = 20;
+        }
         params[1] = new PostParameter("uids", uids);
         params[2] = new PostParameter("start", start);
         params[3] = new PostParameter("num", num);
@@ -247,7 +251,7 @@ public class Kaixin {
 
     public UIDs getAppFriendUids(int start, int num) throws KaixinException {
         PostParameter[] params = new PostParameter[3];
-        params[0] = new PostParameter("access_token", this.accessToken.getToken());
+        params[0] = new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken());
         if (start < 0) start = 0;
         if (num < 0 || num > 50) num = 20;
         params[1] = new PostParameter("start", start);
@@ -261,7 +265,7 @@ public class Kaixin {
         }
 
         PostParameter[] params = new PostParameter[4];
-        params[0] = new PostParameter("access_token", this.accessToken.getToken());
+        params[0] = new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken());
         if (start < 0) start = 0;
         if (num < 0 || num > 50) num = 20;
         params[1] = new PostParameter("uid", uid);
@@ -301,7 +305,7 @@ public class Kaixin {
         if (null != picUrl && picUrl.trim().length() != 0) {
             params.add(new PostParameter("picurl", picUrl));
         }
-        params.add(new PostParameter("access_token", this.accessToken.getToken()));
+        params.add(new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken()));
         return post("/sysnews/send", params);
     }
 
@@ -340,7 +344,7 @@ public class Kaixin {
         if (lon == null) lon = "";
         if (privacy == null) privacy = 0;
         List<PostParameter> postParameters = new ArrayList<PostParameter>(9);
-        postParameters.add(new PostParameter("access_token", this.accessToken.getToken()));
+        postParameters.add(new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken()));
         postParameters.add(new PostParameter("content", content));
         postParameters.add(new PostParameter("save_to_album", saveToAlbum));
         postParameters.add(new PostParameter("location", location));
@@ -365,7 +369,7 @@ public class Kaixin {
         try {
             rid = json.getLong(("rid"));
         } catch (JSONException ex) {
-            log.log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
         }
         return rid;
     }
@@ -374,12 +378,12 @@ public class Kaixin {
         PostParameter[] params = new PostParameter[8];
         params[0] = new PostParameter("title", title);
         params[1] = new PostParameter("privacy", privacy);
-        params[2] = new PostParameter("password", password);
+        params[2] = new PostParameter(OAuthConstants.PASSWORD, password);
         params[3] = new PostParameter("category", category);
         params[4] = new PostParameter("allow_repaste", allowRepaste);
         params[5] = new PostParameter("location", location);
         params[6] = new PostParameter("description", description);
-        params[7] = new PostParameter("access_token", this.accessToken.getToken());
+        params[7] = new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken());
         Response res = post("album/create", params);
 
         JSONObject json = res.asJSONObject();
@@ -387,7 +391,7 @@ public class Kaixin {
         try {
             albumId = json.getLong(("albumid"));
         } catch (JSONException ex) {
-            log.log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
         }
         return albumId;
     }
@@ -397,7 +401,7 @@ public class Kaixin {
         params[0] = new PostParameter("uid", uid);
         params[1] = new PostParameter("start", start);
         params[2] = new PostParameter("num", num);
-        params[3] = new PostParameter("access_token", this.accessToken.getToken());
+        params[3] = new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken());
         return get("album/show", params);
     }
 
@@ -407,7 +411,7 @@ public class Kaixin {
         params[1] = new PostParameter("title", title);
         params[2] = new PostParameter("size", size);
         params[3] = new PostParameter("send_news", send_news);
-        params[4] = new PostParameter("access_token", this.accessToken.getToken());
+        params[4] = new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken());
 
         File picFile = new File(pic);
         if (!picFile.exists()) {
@@ -422,14 +426,13 @@ public class Kaixin {
         params[0] = new PostParameter("uid", uid);
         params[1] = new PostParameter("albumid", albumId);
         params[2] = new PostParameter("pid", pid);
-        params[3] = new PostParameter("password", password);
+        params[3] = new PostParameter(OAuthConstants.PASSWORD, password);
         params[4] = new PostParameter("start", start);
         params[5] = new PostParameter("num", num);
-        params[6] = new PostParameter("access_token", this.accessToken.getToken());
+        params[6] = new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken());
         return post("photo/show", params);
     }
 
-    //--------------base method----------
     protected Response get(String api, PostParameter[] params) throws KaixinException {
         api = baseURL + api + "." + format;
         return http.get(api, params);

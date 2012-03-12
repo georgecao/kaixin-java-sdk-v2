@@ -1,8 +1,7 @@
-<%@page import="com.kaixin001.AppStatus" %>
 <%@ page contentType="text/html;charset=utf-8" %>
-<%@ page language="java" import="com.kaixin001.InvitedUIDs" %>
-<%@ page language="java" import="com.kaixin001.UIDs" %>
-<%@ page import="com.kaixin001.User" %>
+<%@ page language="java" %>
+<%@ page language="java" %>
+<%@ page import="com.kaixin001.*" %>
 <%@ page import="com.kaixin001.http.AccessToken" %>
 <%@ page import="com.kaixin001.http.Response" %>
 <%@ page import="java.util.List" %>
@@ -15,7 +14,11 @@
         window.location.href = window.location.pathname + "?" + access_token;
     }
 </script>
-
+<%
+    Kaixin.consumerKey = "4981162124136a074769f1078676fdb2";
+    Kaixin.consumerSecret = "71d46998b5518f6c3e04958118daccde";
+    Kaixin.redirectUri = "http://www.dajie.com/callback.jsp";
+%>
 <jsp:useBean id="connection" scope="session" class="com.kaixin001.Kaixin"/>
 <%
     String code = request.getParameter("code");
@@ -95,7 +98,7 @@
             long uid = 0;
             long start = 0;
             long num = 2;
-            Response res = connection.album_show(uid, start, num);
+            Response res = connection.showAlbum(uid, start, num);
             out.print(res.asJSONObject().toString());
         } else if ("album_create".equals(method)) {
             String title = "标题";
@@ -105,7 +108,7 @@
             Integer allow_repaste = 0;
             String location = "";
             String description = "";
-            long res = connection.album_create(title, privacy, password, category, allow_repaste, location, description);
+            long res = connection.createAlbum(title, privacy, password, category, allow_repaste, location, description);
 
             if (res == 0) {
                 out.println("publish error!");
@@ -119,7 +122,7 @@
             String password = "";
             long start = 0;
             long num = 2;
-            Response res = connection.photo_show(uid, albumid, pid, password, start, num);
+            Response res = connection.showPhoto(uid, albumid, pid, password, start, num);
             out.print(res.asJSONObject().toString());
         } else if ("photo_upload".equals(method)) {
             long albumid = 0;
@@ -127,7 +130,7 @@
             String size = "mid";
             Integer send_news = 1;
             String pic = request.getParameter("pic");//可以是文件路径,如"D:\\tup.jpg"
-            Response res = connection.photo_upload(albumid, title, size, send_news, pic);
+            Response res = connection.uploadPhoto(albumid, title, size, send_news, pic);
             out.print(res.asJSONObject().toString());
         }
     } else if (access_token != null) {

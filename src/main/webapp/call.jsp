@@ -1,6 +1,12 @@
 <%@ page contentType="text/html;charset=utf-8" %>
-<%@ page language="java" import="com.kaixin001.http.AccessToken" %>
+<%@ page language="java" import="com.kaixin001.Kaixin" %>
+<%@ page import="com.kaixin001.http.AccessToken" %>
 <%@ page language="java" %>
+<%
+    Kaixin.consumerKey = "4981162124136a074769f1078676fdb2";
+    Kaixin.consumerSecret = "71d46998b5518f6c3e04958118daccde";
+    Kaixin.redirectUri = "http://www.dajie.com/callback.jsp";
+%>
 
 <jsp:useBean id="connection" scope="session" class="com.kaixin001.Kaixin"/>
 <%

@@ -1,10 +1,10 @@
 package com.kaixin001;
 
 import com.kaixin001.http.AccessToken;
+import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 /**
  * Say something?
@@ -20,7 +20,7 @@ public class KaixinTest {
     private Kaixin kaixin;
     private String scope = "create_records";
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
         kaixin = new KaixinBuilder()
                 .apiKey("4981162124136a074769f1078676fdb2")

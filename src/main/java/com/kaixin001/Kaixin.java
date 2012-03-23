@@ -306,7 +306,7 @@ public class Kaixin {
             params.add(new PostParameter("picurl", picUrl));
         }
         params.add(new PostParameter(OAuthConstants.ACCESS_TOKEN, this.accessToken.getToken()));
-        return post("/sysnews/send", params);
+        return post("sysnews/send", params);
     }
 
     /**

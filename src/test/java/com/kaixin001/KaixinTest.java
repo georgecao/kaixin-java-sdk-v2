@@ -1,6 +1,5 @@
 package com.kaixin001;
 
-import com.kaixin001.http.AccessToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -43,8 +42,6 @@ public class KaixinTest {
 
     @Test
     public void testGetOAuthAccessTokenFromCode() throws Exception {
-        AccessToken token = kaixin.getOAuthAccessTokenFromCode("12122221212");
-        LOG.info("Access token is: {}", token);
     }
 
     @Test

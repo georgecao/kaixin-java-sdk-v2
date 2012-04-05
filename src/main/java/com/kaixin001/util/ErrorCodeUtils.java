@@ -1,6 +1,8 @@
 package com.kaixin001.util;
 
+import com.kaixin001.KaixinException;
 import com.kaixin001.http.ErrorCode;
+import com.kaixin001.http.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,5 +35,21 @@ public class ErrorCodeUtils {
             ec.setMessage(detailMsg);
         }
         return ec;
+    }
+
+    public static boolean isInvalidAccessToken(KaixinException e) {
+        return check(e, StatusCode.NOT_AUTHORIZED, 40117);
+    }
+
+    public static boolean isAccessTokenExpired(KaixinException e) {
+        return check(e, StatusCode.NOT_AUTHORIZED, 40118);
+    }
+
+    private static boolean check(KaixinException e, int statusCode, int errorCode) {
+        ErrorCode ec = e.getErrorCode();
+        if (null != ec) {
+            return statusCode == e.getStatusCode() && errorCode == ec.getCode();
+        }
+        return false;
     }
 }

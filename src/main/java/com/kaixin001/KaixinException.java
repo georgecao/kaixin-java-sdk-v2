@@ -26,6 +26,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package com.kaixin001;
 
+import com.kaixin001.http.ErrorCode;
+import com.kaixin001.util.ErrorCodeUtils;
+
 /**
  * An exception class that will be thrown when KxAPI calls are failed.<br>
  * In case the Kx server returned HTTP error code, you can get the HTTP status code using getStatusCode() method.
@@ -34,6 +37,7 @@ package com.kaixin001;
  */
 public class KaixinException extends Exception {
     private int statusCode = -1;
+    private ErrorCode errorCode;
     private static final long serialVersionUID = -2623309261327598087L;
 
     public KaixinException(String msg) {
@@ -44,10 +48,14 @@ public class KaixinException extends Exception {
         super(cause);
     }
 
-    public KaixinException(String msg, int statusCode) {
+    public KaixinException(String msg, String rawResponse, int statusCode) {
         super(msg);
+        this.errorCode = ErrorCodeUtils.parse(rawResponse);
         this.statusCode = statusCode;
+    }
 
+    public KaixinException(String msg, int statusCode) {
+        this(msg, "", statusCode);
     }
 
     public KaixinException(String msg, Exception cause) {
@@ -58,6 +66,10 @@ public class KaixinException extends Exception {
         super(msg, cause);
         this.statusCode = statusCode;
 
+    }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
     }
 
     public int getStatusCode() {

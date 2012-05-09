@@ -33,19 +33,19 @@ import com.kaixin001.http.PostParameter;
 import com.kaixin001.http.Response;
 import com.kaixin001.org.json.JSONException;
 import com.kaixin001.org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
  * A java representation of the <a href="http://wiki.open.kaixin001.com/">Kaixin API</a>.
  */
 public class Kaixin {
-    private static final Logger LOG = Logger.getLogger(Kaixin.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Kaixin.class.getName());
     public static String consumerKey = ""; //api key
     public static String consumerSecret = ""; //secret key
     public static String redirectUri = ""; //需与注册信息中网站地址的域名一致，可修改域名映射在本地进行测试
@@ -309,6 +309,14 @@ public class Kaixin {
         return post("sysnews/send", params);
     }
 
+    public Response sendMessage(String friendIds, String content, String... attachments) throws KaixinException {
+        List<PostParameter> params = new ArrayList<PostParameter>(2);
+        params.add(new PostParameter("fuids", friendIds));
+        params.add(new PostParameter("content", content));
+        LOG.info("{}", attachments.length);
+        return post("message/send", params);
+    }
+
     /**
      * 发布一条记录(可以带一张图片)
      *
@@ -361,7 +369,9 @@ public class Kaixin {
             }
             res = http.multPartURL("pic", baseURL + "records/add" + "." + format, postParameters.toArray(new PostParameter[postParameters.size()]), picFile);
         } else {
-            postParameters.add(new PostParameter("picurl", picUrl));
+            if (null != picUrl && picUrl.trim().length() > 0) {
+                postParameters.add(new PostParameter("picurl", picUrl));
+            }
             res = post("records/add", postParameters);
         }
         JSONObject json = res.asJSONObject();
@@ -369,7 +379,7 @@ public class Kaixin {
         try {
             rid = json.getLong(("rid"));
         } catch (JSONException ex) {
-            LOG.log(Level.SEVERE, null, ex);
+            LOG.error("Post record {}", content, ex);
         }
         return rid;
     }
@@ -391,7 +401,7 @@ public class Kaixin {
         try {
             albumId = json.getLong(("albumid"));
         } catch (JSONException ex) {
-            LOG.log(Level.SEVERE, null, ex);
+            LOG.error("Create album {}", title, ex);
         }
         return albumId;
     }
